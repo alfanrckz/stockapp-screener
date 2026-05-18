@@ -30,10 +30,27 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document);
 
+  if (process.env.VERCEL) {
+    await app.init();
+    return app.getHttpAdapter().getInstance();
+  }
+
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
   logger.log(`Server berjalan di http://localhost:${port}`);
   logger.log(`Swagger docs: http://localhost:${port}/docs`);
 }
 
-bootstrap();
+// Untuk deployment normal/local
+if (!process.env.VERCEL) {
+  bootstrap();
+}
+
+// Untuk Vercel Serverless
+let cachedHandler: any;
+export default async (req: any, res: any) => {
+  if (!cachedHandler) {
+    cachedHandler = await bootstrap();
+  }
+  return cachedHandler(req, res);
+};
