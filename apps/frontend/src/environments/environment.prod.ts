@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://idx-screener-backend.onrender.com',
+  apiBaseUrl: 'https://stockapp-screener-backend-a98y.vercel.app',
 };
