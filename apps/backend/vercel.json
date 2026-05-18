@@ -1,17 +1,8 @@
 {
   "version": 2,
-  "installCommand": "npm install",
+  "installCommand": "npm install --include=dev",
   "buildCommand": "npm run build",
-  "builds": [
-    {
-      "src": "dist/src/main.js",
-      "use": "@vercel/node"
-    }
-  ],
   "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/dist/src/main.js"
-    }
+    { "src": "/(.*)", "dest": "/api/index" }
   ]
 }
