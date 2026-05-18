@@ -1,0 +1,119 @@
+<p-dialog
+  [header]="stock ? stock.stock_code + ' — ' + (stock.stock_name ?? '') : 'Chart'"
+  [visible]="visible"
+  (visibleChange)="visible = $event"
+  (onHide)="onHide()"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '90vw', maxWidth: '920px' }"
+  styleClass="chart-dialog"
+>
+  @if (stock) {
+    <!-- Trading Plan Header -->
+    <div class="trading-plan-bar">
+      <div class="plan-item entry">
+        <span class="plan-label">Entry</span>
+        <span class="plan-value">{{ stock.entry_price | number:'1.0-0' }}</span>
+      </div>
+      <div class="divider">→</div>
+      <div class="plan-item tp">
+        <span class="plan-label">Target TP</span>
+        <span class="plan-value">{{ stock.take_profit_price | number:'1.0-0' }}</span>
+      </div>
+      <div class="divider">|</div>
+      <div class="plan-item cl">
+        <span class="plan-label">Cut Loss</span>
+        <span class="plan-value">{{ stock.cut_loss_price | number:'1.0-0' }}</span>
+      </div>
+      <div class="divider">|</div>
+      <div class="plan-item rr">
+        <span class="plan-label">R/R</span>
+        <span class="plan-value">1 : {{ stock.risk_reward_ratio | number:'1.1-1' }}</span>
+      </div>
+      <div class="divider">|</div>
+      <div class="plan-item">
+        <span class="plan-label">RSI(14)</span>
+        <span class="plan-value" [class.rsi-oversold]="stock.rsi_14 < 40">
+          {{ stock.rsi_14 | number:'1.1-1' }}
+        </span>
+      </div>
+      <div class="divider">|</div>
+      <div class="plan-item">
+        <span class="plan-label">Volume</span>
+        <span class="plan-value" [class.spike]="stock.volume_spike">
+          {{ stock.volume_ratio | number:'1.1-1' }}x VMA
+        </span>
+      </div>
+    </div>
+  }
+
+  <!-- Chart Container -->
+  <div class="chart-wrapper">
+    @if (loading) {
+      <p-skeleton height="420px" styleClass="chart-skeleton" />
+    }
+    <div #chartContainer class="chart-container" [class.hidden]="loading"></div>
+  </div>
+
+  <!-- Volume Analysis Detail -->
+  @if (stock) {
+    <div class="bando-detail">
+      <div class="bando-section">
+        <span class="section-title">CMF (20)</span>
+        <div class="metric-big" [class.positive]="stock.cmf_20 > 0" [class.negative]="stock.cmf_20 < 0">
+          {{ stock.cmf_20 | number:'1.3-3' }}
+        </div>
+        <div class="metric-label">
+          @if (stock.cmf_20 >= 0.15) { Akumulasi Kuat }
+          @else if (stock.cmf_20 >= 0.05) { Akumulasi Lemah }
+          @else if (stock.cmf_20 <= -0.10) { Distribusi }
+          @else { Netral }
+        </div>
+        <div class="net-row mt-2">
+          <span>Chaikin Money Flow:</span>
+          <span class="hint">range -1 → +1</span>
+        </div>
+      </div>
+      <div class="bando-section">
+        <span class="section-title">OBV Trend</span>
+        <div class="metric-big"
+          [class.positive]="stock.obv_trend === 'rising'"
+          [class.negative]="stock.obv_trend === 'falling'">
+          {{ stock.obv_trend | titlecase }}
+        </div>
+        @if (stock.obv_divergence) {
+          <div class="divergence-badge">
+            ↑ Bullish Divergence
+          </div>
+        }
+        <div class="net-row mt-2">
+          <span>On-Balance Volume:</span>
+          <span class="hint">konfirmasi arah harga</span>
+        </div>
+      </div>
+      <div class="bando-section">
+        <span class="section-title">Volume</span>
+        <div class="net-row">
+          <span>Hari ini:</span>
+          <span [class.spike]="stock.volume_spike">
+            {{ stock.volume_today | number:'1.0-0' }} lot
+          </span>
+        </div>
+        <div class="net-row">
+          <span>VMA 20:</span>
+          <span>{{ stock.vma_20 | number:'1.0-0' }} lot</span>
+        </div>
+        <div class="net-row">
+          <span>Rasio:</span>
+          <span [class.positive]="stock.volume_spike">{{ stock.volume_ratio | number:'1.1-1' }}×</span>
+        </div>
+        @if (stock.retail_panic_selling) {
+          <div class="divergence-badge mt-2">
+            Smart Money Accumulating
+          </div>
+        }
+      </div>
+    </div>
+  }
+</p-dialog>

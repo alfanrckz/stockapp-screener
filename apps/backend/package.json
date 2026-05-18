@@ -1,0 +1,37 @@
+{
+  "name": "idx-screener-backend",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "nest start --watch",
+    "build": "nest build",
+    "start": "node dist/src/main",
+    "start:prod": "node dist/src/main",
+    "seed:stocks": "ts-node -P scripts/tsconfig.json scripts/seed-stocks.ts",
+    "seed:ohlcv": "ts-node -P scripts/tsconfig.json scripts/backfill-ohlcv.ts",
+    "seed:broker": "ts-node -P scripts/tsconfig.json scripts/seed-broker-mock.ts",
+    "seed:all": "npm run seed:stocks && npm run seed:ohlcv && npm run seed:broker"
+  },
+  "dependencies": {
+    "@nestjs/common": "^10.4.0",
+    "@nestjs/config": "^3.2.0",
+    "@nestjs/core": "^10.4.0",
+    "@nestjs/platform-express": "^10.4.0",
+    "@nestjs/schedule": "^4.1.0",
+    "@nestjs/swagger": "^7.4.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "@types/ws": "^8.18.1",
+    "axios": "^1.7.7",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.1",
+    "ws": "^8.20.1"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^10.4.0",
+    "@types/node": "^22.0.0",
+    "dotenv": "^17.4.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.0"
+  }
+}

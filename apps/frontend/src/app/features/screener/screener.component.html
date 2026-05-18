@@ -1,0 +1,345 @@
+<p-toast position="top-right" />
+
+<!-- ═══════════════════════════════ HEADER ════════════════════════════════ -->
+<div class="screener-header">
+  <div class="header-left">
+    <h1 class="page-title">
+      Hasil Screening
+      <span class="date-label">{{ selectedDate() ?? '—' }}</span>
+    </h1>
+    <p class="page-sub">Saham lolos semua 4 filter — siap dianalisa untuk swing entry</p>
+  </div>
+
+  <div class="header-controls">
+    <p-dropdown
+      [options]="dateDropdownOptions()"
+      [ngModel]="selectedDate()"
+      (ngModelChange)="onDateChange($event)"
+      placeholder="Pilih Tanggal"
+      [style]="{ minWidth: '148px' }"
+    />
+
+    <p-dropdown
+      [options]="bandoFilterOptions"
+      [ngModel]="selectedBandoFilter()"
+      (ngModelChange)="selectedBandoFilter.set($event)"
+      placeholder="Filter"
+      [style]="{ minWidth: '190px' }"
+    />
+
+    <span class="search-wrap">
+      <i class="pi pi-search search-icon"></i>
+      <input
+        pInputText
+        [(ngModel)]="globalFilter"
+        placeholder="Cari kode / nama…"
+        class="search-input"
+      />
+    </span>
+
+    <p-button
+      icon="pi pi-refresh"
+      [text]="true"
+      [rounded]="true"
+      pTooltip="Refresh data"
+      tooltipPosition="bottom"
+      (onClick)="onRefresh()"
+      [loading]="loading()"
+    />
+
+    <p-button
+      label="Run Screening"
+      icon="pi pi-play"
+      severity="success"
+      [outlined]="true"
+      (onClick)="onRunScreening()"
+      [loading]="runningScreen()"
+      pTooltip="Jalankan ulang screening dengan data hari ini"
+      tooltipPosition="bottom"
+    />
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ STAT CHIPS ════════════════════════════ -->
+<div class="stat-bar">
+  <div class="stat-chip total">
+    <span class="stat-val">{{ summary().total }}</span>
+    <span class="stat-lbl">Lolos Screening</span>
+  </div>
+  <div class="stat-divider"></div>
+  <div class="stat-chip green"
+    pTooltip="CMF ≥ 0.15 — Institusi agresif beli"
+    tooltipPosition="bottom"
+    (click)="selectedBandoFilter.set('Big Accumulation')"
+    style="cursor:pointer">
+    <span class="stat-val">{{ summary().bigAccum }}</span>
+    <span class="stat-lbl">Big Accum</span>
+  </div>
+  <div class="stat-chip blue"
+    pTooltip="CMF ≥ 0.05 — Akumulasi moderat"
+    tooltipPosition="bottom"
+    (click)="selectedBandoFilter.set('Small Accumulation')"
+    style="cursor:pointer">
+    <span class="stat-val">{{ summary().smallAccum }}</span>
+    <span class="stat-lbl">Small Accum</span>
+  </div>
+  <div class="stat-chip orange"
+    pTooltip="Volume hari ini > 1.5× rata-rata 20 hari"
+    tooltipPosition="bottom">
+    <span class="stat-val">{{ summary().volSpike }}</span>
+    <span class="stat-lbl">Vol Spike</span>
+  </div>
+  <div class="stat-chip purple"
+    pTooltip="OBV naik saat harga turun — smart money akumulasi"
+    tooltipPosition="bottom">
+    <span class="stat-val">{{ summary().obvDiverg }}</span>
+    <span class="stat-lbl">OBV Diverge</span>
+  </div>
+  <div class="stat-chip yellow"
+    pTooltip="MACD golden cross terbentuk"
+    tooltipPosition="bottom">
+    <span class="stat-val">{{ summary().goldenCross }}</span>
+    <span class="stat-lbl">Golden Cross</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ TABLE ════════════════════════════════ -->
+@if (loading()) {
+  <div class="loading-wrap">
+    <p-progressSpinner strokeWidth="3" [style]="{ width: '42px', height: '42px' }" />
+    <p>Memuat hasil screening…</p>
+  </div>
+} @else {
+  <p-table
+    [value]="filteredResults()"
+    [paginator]="true"
+    [rows]="25"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [sortField]="'signal_strength'"
+    [sortOrder]="-1"
+    [globalFilterFields]="['stock_code','stock_name','bandarmology_status','technical_position']"
+    dataKey="stock_code"
+    styleClass="p-datatable-sm screener-table"
+    [scrollable]="true"
+    scrollHeight="calc(100vh - 280px)"
+    rowHover
+  >
+    <ng-template pTemplate="caption">
+      <div class="table-caption">
+        <span>{{ filteredResults().length }} saham</span>
+        @if (selectedBandoFilter()) {
+          <span class="filter-active" (click)="selectedBandoFilter.set(null)">
+            <i class="pi pi-times"></i> {{ selectedBandoFilter() }}
+          </span>
+        }
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="stock_code" style="min-width:120px">
+          Emiten <p-sortIcon field="stock_code" />
+        </th>
+        <th pSortableColumn="bandarmology_status" style="min-width:200px"
+          pTooltip="Status akumulasi berdasarkan CMF + OBV" tooltipPosition="top">
+          Money Flow <p-sortIcon field="bandarmology_status" />
+        </th>
+        <th pSortableColumn="technical_position" style="min-width:185px">
+          Posisi Teknikal <p-sortIcon field="technical_position" />
+        </th>
+        <th pSortableColumn="close_price" class="text-right" style="min-width:100px">
+          Harga <p-sortIcon field="close_price" />
+        </th>
+        <th class="text-center" style="min-width:75px"
+          pTooltip="Perubahan dari hari sebelumnya" tooltipPosition="top">
+          Chg%
+        </th>
+        <th pSortableColumn="entry_price" class="text-right" style="min-width:95px"
+          pTooltip="Harga entry ideal — dekat support terdekat" tooltipPosition="top">
+          Entry <p-sortIcon field="entry_price" />
+        </th>
+        <th class="text-right" style="min-width:95px"
+          pTooltip="Target take profit — level resistance" tooltipPosition="top">
+          Target TP
+        </th>
+        <th class="text-right" style="min-width:90px"
+          pTooltip="Level cut loss — di bawah swing support" tooltipPosition="top">
+          Cut Loss
+        </th>
+        <th pSortableColumn="risk_reward_ratio" class="text-center" style="min-width:70px"
+          pTooltip="Risk:Reward ratio. Minimum 1:2" tooltipPosition="top">
+          R/R <p-sortIcon field="risk_reward_ratio" />
+        </th>
+        <th pSortableColumn="rsi_14" class="text-right" style="min-width:72px"
+          pTooltip="RSI 14-period. Ideal: 30–55" tooltipPosition="top">
+          RSI <p-sortIcon field="rsi_14" />
+        </th>
+        <th pSortableColumn="volume_ratio" class="text-right" style="min-width:85px"
+          pTooltip="Volume hari ini ÷ rata-rata volume 20 hari" tooltipPosition="top">
+          Vol/VMA <p-sortIcon field="volume_ratio" />
+        </th>
+        <th pSortableColumn="signal_strength" class="text-center" style="min-width:85px"
+          pTooltip="Signal score 0–100. Makin tinggi makin kuat" tooltipPosition="top">
+          Score <p-sortIcon field="signal_strength" />
+        </th>
+        <th style="min-width:48px"></th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-row>
+      <tr class="screener-row" (click)="openChart(row)">
+
+        <!-- Emiten -->
+        <td>
+          <div class="emiten-cell">
+            <span class="ticker">{{ row.stock_code }}</span>
+            <span class="company">{{ row.stock_name }}</span>
+          </div>
+        </td>
+
+        <!-- Money Flow -->
+        <td>
+          <div class="mf-cell">
+            <div class="mf-top">
+              <p-tag
+                [value]="row.bandarmology_status"
+                [severity]="getBandoSeverity(row.bandarmology_status)"
+                [style]="{ fontSize: '0.68rem', padding: '2px 6px' }"
+              />
+              @if (row.retail_panic_selling) {
+                <span class="smart-badge"
+                  pTooltip="OBV Divergence: smart money akumulasi saat harga turun"
+                  tooltipPosition="top">
+                  <i class="pi pi-star-fill"></i> Smart
+                </span>
+              }
+            </div>
+            <div class="mf-bottom">
+              <span class="cmf-val" [style.color]="getCMFColor(row.cmf_20)"
+                pTooltip="Chaikin Money Flow 20-period. >0.15=beli kuat, <-0.10=jual" tooltipPosition="top">
+                CMF {{ getCMFLabel(row.cmf_20) }}
+              </span>
+              <span class="obv-icon" [style.color]="getOBVColor(row.obv_trend)"
+                pTooltip="OBV Trend: {{ row.obv_trend ?? '—' }}" tooltipPosition="top">
+                <i class="pi {{ getOBVIcon(row.obv_trend) }}"></i>
+                {{ row.obv_trend ?? '—' }}
+              </span>
+            </div>
+          </div>
+        </td>
+
+        <!-- Posisi Teknikal -->
+        <td>
+          <div class="tech-cell">
+            <span class="tech-pos">{{ row.technical_position }}</span>
+            @if (row.macd_golden_cross) {
+              <span class="gc-badge" pTooltip="MACD Golden Cross terkonfirmasi" tooltipPosition="top">
+                ✦ GC
+              </span>
+            }
+          </div>
+        </td>
+
+        <!-- Harga -->
+        <td class="text-right mono fw600">
+          {{ row.close_price | number:'1.0-0' }}
+        </td>
+
+        <!-- Chg% -->
+        <td class="text-center">
+          <p-tag
+            [value]="(row.change_pct > 0 ? '+' : '') + (row.change_pct | number:'1.1-1') + '%'"
+            [severity]="getChangeSeverity(row.change_pct)"
+            [style]="{ fontSize: '0.72rem', padding: '2px 6px' }"
+          />
+        </td>
+
+        <!-- Entry -->
+        <td class="text-right mono c-entry fw600">
+          {{ row.entry_price | number:'1.0-0' }}
+        </td>
+
+        <!-- TP -->
+        <td class="text-right mono c-tp fw600">
+          {{ row.take_profit_price | number:'1.0-0' }}
+        </td>
+
+        <!-- CL -->
+        <td class="text-right mono c-cl fw600">
+          {{ row.cut_loss_price | number:'1.0-0' }}
+        </td>
+
+        <!-- R/R -->
+        <td class="text-center">
+          <p-tag
+            [value]="'1:' + (row.risk_reward_ratio | number:'1.1-1')"
+            [severity]="getRRSeverity(row.risk_reward_ratio)"
+            [style]="{ fontSize: '0.72rem', padding: '2px 6px' }"
+          />
+        </td>
+
+        <!-- RSI -->
+        <td class="text-right">
+          <span class="rsi-val" [class.rsi-good]="row.rsi_14 >= 30 && row.rsi_14 <= 55"
+            [class.rsi-low]="row.rsi_14 < 30">
+            {{ row.rsi_14 | number:'1.1-1' }}
+          </span>
+        </td>
+
+        <!-- Vol/VMA -->
+        <td class="text-right mono">
+          <span [class.vol-spike]="row.volume_spike">
+            {{ row.volume_ratio | number:'1.1-1' }}×
+          </span>
+        </td>
+
+        <!-- Score -->
+        <td class="text-center">
+          <div class="score-wrap">
+            <div
+              class="score-ring"
+              [style.--pct]="row.signal_strength + '%'"
+              [style.--c]="getScoreColor(row.signal_strength)"
+            >
+              <span class="score-num" [style.color]="getScoreColor(row.signal_strength)">
+                {{ row.signal_strength }}
+              </span>
+            </div>
+            <span class="score-lbl" [style.color]="getScoreColor(row.signal_strength)">
+              {{ getScoreLabel(row.signal_strength) }}
+            </span>
+          </div>
+        </td>
+
+        <!-- Chart -->
+        <td class="text-center" (click)="$event.stopPropagation()">
+          <p-button
+            icon="pi pi-chart-bar"
+            [text]="true" [rounded]="true" size="small"
+            pTooltip="Buka chart" tooltipPosition="left"
+            (onClick)="openChart(row)"
+          />
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="13">
+          <div class="empty-state">
+            <i class="pi pi-chart-line"></i>
+            <p>Belum ada data screening</p>
+            <span>Klik <strong>Run Screening</strong> untuk memulai, atau tunggu cron job 16:30 WIB</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+}
+
+<!-- ══════════════════════════════ CHART MODAL ════════════════════════════ -->
+<app-chart-modal
+  [stock]="selectedStock()"
+  [visible]="chartVisible()"
+  (visibleChange)="chartVisible.set($event)"
+/>

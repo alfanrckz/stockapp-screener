@@ -1,0 +1,128 @@
+:host ::ng-deep .chart-dialog .p-dialog-content {
+  padding: 0 1rem 1rem;
+  background: #1e1e2e;
+  color: #cdd6f4;
+}
+
+:host ::ng-deep .chart-dialog .p-dialog-header {
+  background: #181825;
+  color: #cdd6f4;
+  border-bottom: 1px solid #313244;
+}
+
+.trading-plan-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #313244;
+  flex-wrap: wrap;
+
+  .plan-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .plan-label {
+    font-size: 0.65rem;
+    color: #6c7086;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .plan-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    color: #cdd6f4;
+
+    &.rsi-oversold { color: #89b4fa; }
+    &.spike        { color: #a6e3a1; }
+  }
+
+  .entry .plan-value  { color: #89b4fa; }
+  .tp .plan-value     { color: #a6e3a1; }
+  .cl .plan-value     { color: #f38ba8; }
+  .rr .plan-value     { color: #fab387; }
+
+  .divider {
+    color: #45475a;
+    font-size: 0.8rem;
+  }
+}
+
+.chart-wrapper {
+  position: relative;
+  margin: 0.75rem 0;
+
+  .chart-container {
+    width: 100%;
+    min-height: 420px;
+    &.hidden { visibility: hidden; }
+  }
+}
+
+.bando-detail {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #313244;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bando-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+
+  .section-title {
+    font-size: 0.7rem;
+    color: #6c7086;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+  }
+}
+
+.net-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+
+  .hint { color: #6c7086; font-size: 0.7rem; }
+}
+
+.metric-big {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: #cdd6f4;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: #9399b2;
+}
+
+.divergence-badge {
+  display: inline-block;
+  background: rgba(166, 227, 161, 0.15);
+  color: #a6e3a1;
+  border: 1px solid rgba(166, 227, 161, 0.3);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.mt-2 { margin-top: 0.5rem; }
+
+.positive { color: #a6e3a1 !important; }
+.negative { color: #f38ba8 !important; }
+.spike    { color: #a6e3a1 !important; font-weight: 700; }

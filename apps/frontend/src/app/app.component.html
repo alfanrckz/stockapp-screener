@@ -1,0 +1,36 @@
+<nav class="app-nav">
+  <a routerLink="/screener" class="nav-brand">
+    <div class="brand-icon">
+      <i class="pi pi-chart-line"></i>
+    </div>
+    <div class="brand-text">
+      <span class="brand-name">IDX Screener</span>
+      <span class="brand-sub">Swing Trading</span>
+    </div>
+  </a>
+
+  <div class="nav-links">
+    <a routerLink="/screener" routerLinkActive="active" class="nav-link">
+      <i class="pi pi-table"></i>
+      <span>Screener</span>
+    </a>
+    <a routerLink="/guide" routerLinkActive="active" class="nav-link">
+      <i class="pi pi-book"></i>
+      <span>Panduan</span>
+    </a>
+  </div>
+
+  <div class="nav-right">
+    <span class="nav-time">{{ currentTime() }}</span>
+    <span class="market-chip" [ngClass]="marketStatus().cls">
+      @if (marketStatus().cls === 'open') {
+        <span class="pulse-dot"></span>
+      }
+      {{ marketStatus().label }}
+    </span>
+  </div>
+</nav>
+
+<main class="app-main">
+  <router-outlet />
+</main>

@@ -1,0 +1,206 @@
+<div class="guide-page">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <div class="guide-hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="pi pi-book"></i> Panduan Lengkap
+      </div>
+      <h1>Cara Baca Screener &amp; Kapan Eksekusi</h1>
+      <p>Panduan step-by-step untuk memaksimalkan hasil dari IDX Swing Screener — mulai dari membaca sinyal hingga timing entry yang presisi.</p>
+    </div>
+    <a routerLink="/screener" class="hero-cta">
+      <i class="pi pi-table"></i> Buka Screener
+    </a>
+  </div>
+
+  <div class="guide-body">
+
+    <!-- ── Timing Section ──────────────────────────────────────────────── -->
+    <section class="guide-section" id="timing">
+      <div class="section-header">
+        <div class="section-icon" style="background: rgba(137,180,250,0.15); color: #89b4fa">
+          <i class="pi pi-clock"></i>
+        </div>
+        <div>
+          <h2>Jadwal Harian Trader</h2>
+          <p>IDX buka 09:00 – 15:55 WIB. Begini rutinitas idealnya:</p>
+        </div>
+      </div>
+
+      <div class="timeline">
+        @for (event of timeline; track event.time) {
+          <div class="timeline-item" [class.highlight]="event.highlight">
+            <div class="tl-time">{{ event.time }}</div>
+            <div class="tl-dot" [ngClass]="event.cls"></div>
+            <div class="tl-content">
+              <div class="tl-label">
+                <i class="pi {{ event.icon }}"></i>
+                {{ event.label }}
+                @if (event.highlight) {
+                  <span class="tl-badge">Penting</span>
+                }
+              </div>
+              <p class="tl-desc">{{ event.desc }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- ── Entry Criteria ──────────────────────────────────────────────── -->
+    <section class="guide-section" id="criteria">
+      <div class="section-header">
+        <div class="section-icon" style="background: rgba(166,227,161,0.15); color: #a6e3a1">
+          <i class="pi pi-check-circle"></i>
+        </div>
+        <div>
+          <h2>4 Kriteria Entry</h2>
+          <p>Semua harus terpenuhi sebelum klik beli. Screening sudah mengerjakan langkah 1 &amp; 4 otomatis.</p>
+        </div>
+      </div>
+
+      <div class="criteria-grid">
+        @for (c of criteria; track c.step) {
+          <div class="criteria-card">
+            <div class="criteria-header" [style.borderColor]="c.color">
+              <span class="step-num" [style.color]="c.color">{{ c.step }}</span>
+              <div class="step-icon" [style.background]="c.color + '22'" [style.color]="c.color">
+                <i class="pi {{ c.icon }}"></i>
+              </div>
+              <div>
+                <div class="step-title">{{ c.title }}</div>
+                <div class="step-sub">{{ c.subtitle }}</div>
+              </div>
+            </div>
+            <ul class="criteria-list">
+              @for (item of c.items; track item.label) {
+                <li>
+                  <i class="pi pi-check" [style.color]="c.color"></i>
+                  <div>
+                    <span class="item-label">{{ item.label }}</span>
+                    <span class="item-desc">{{ item.desc }}</span>
+                  </div>
+                </li>
+              }
+            </ul>
+            <div class="criteria-note">
+              <i class="pi pi-info-circle"></i>
+              {{ c.note }}
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- ── Signal Score ────────────────────────────────────────────────── -->
+    <section class="guide-section" id="score">
+      <div class="section-header">
+        <div class="section-icon" style="background: rgba(203,166,247,0.15); color: #cba6f7">
+          <i class="pi pi-star"></i>
+        </div>
+        <div>
+          <h2>Cara Baca Signal Score</h2>
+          <p>Nilai 0 – 100 yang merangkum semua kondisi dalam satu angka.</p>
+        </div>
+      </div>
+
+      <div class="score-section">
+        <div class="score-legend">
+          <div class="score-tier" style="--c: #a6e3a1">
+            <span class="tier-range">70 – 100</span>
+            <span class="tier-label">Strong Buy</span>
+            <span class="tier-desc">Semua sinyal konfirmasi — entry optimal</span>
+          </div>
+          <div class="score-tier" style="--c: #89b4fa">
+            <span class="tier-range">50 – 69</span>
+            <span class="tier-label">Moderate</span>
+            <span class="tier-desc">Gunakan sizing lebih kecil (50% dari normal)</span>
+          </div>
+          <div class="score-tier" style="--c: #fab387">
+            <span class="tier-range">30 – 49</span>
+            <span class="tier-label">Weak</span>
+            <span class="tier-desc">Tunggu konfirmasi tambahan, jangan terburu</span>
+          </div>
+          <div class="score-tier" style="--c: #f38ba8">
+            <span class="tier-range">&lt; 30</span>
+            <span class="tier-label">Skip</span>
+            <span class="tier-desc">Tidak direkomendasikan untuk entry</span>
+          </div>
+        </div>
+
+        <table class="score-table">
+          <thead>
+            <tr>
+              <th>Kondisi</th>
+              <th>Poin</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of scoreBreakdown; track row.cond) {
+              <tr>
+                <td>{{ row.cond }}</td>
+                <td>
+                  <span class="pts-badge" [style.color]="row.color">{{ row.pts }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── DOs and DON'Ts ─────────────────────────────────────────────── -->
+    <section class="guide-section" id="rules">
+      <div class="section-header">
+        <div class="section-icon" style="background: rgba(249,226,175,0.15); color: #f9e2af">
+          <i class="pi pi-bolt"></i>
+        </div>
+        <div>
+          <h2>Golden Rules</h2>
+          <p>Aturan yang membedakan trader disiplin dengan trader yang sering boncos.</p>
+        </div>
+      </div>
+
+      <div class="rules-grid">
+        <div class="rules-card do">
+          <div class="rules-title">
+            <i class="pi pi-check-circle"></i> Lakukan Ini
+          </div>
+          <ul>
+            @for (item of dos; track item) {
+              <li>
+                <i class="pi pi-check"></i>
+                <span>{{ item }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+        <div class="rules-card dont">
+          <div class="rules-title">
+            <i class="pi pi-times-circle"></i> Hindari Ini
+          </div>
+          <ul>
+            @for (item of donts; track item) {
+              <li>
+                <i class="pi pi-times"></i>
+                <span>{{ item }}</span>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Disclaimer ─────────────────────────────────────────────────── -->
+    <div class="disclaimer">
+      <i class="pi pi-info-circle"></i>
+      <p>
+        Screener ini adalah <strong>alat bantu analisis teknikal</strong>, bukan rekomendasi investasi.
+        Setiap keputusan beli/jual adalah tanggung jawab trader sepenuhnya.
+        Selalu konfirmasi dengan analisis mandiri sebelum eksekusi.
+      </p>
+    </div>
+
+  </div>
+</div>

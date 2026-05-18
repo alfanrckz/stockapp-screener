@@ -1,0 +1,88 @@
+// Global styles — IDX Screener
+// Color palette: Catppuccin Mocha
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: #11111b;
+  color: #cdd6f4;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+// ── PrimeNG Dark Theme Overrides ─────────────────────────────────────────────
+:root {
+  --primary-color:      #89b4fa;
+  --surface-0:          #11111b;
+  --surface-50:         #181825;
+  --surface-100:        #1e1e2e;
+  --surface-200:        #313244;
+  --surface-ground:     #11111b;
+  --surface-section:    #1e1e2e;
+  --surface-card:       #1e1e2e;
+  --surface-overlay:    #181825;
+  --surface-border:     #313244;
+  --text-color:         #cdd6f4;
+  --text-color-secondary: #a6adc8;
+  --border-radius:      8px;
+}
+
+// Scrollbar
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: #181825; }
+::-webkit-scrollbar-thumb  { background: #45475a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #585b70; }
+
+// PrimeNG Component overrides
+.p-dropdown {
+  background: #181825 !important;
+  border-color: #313244 !important;
+  color: #cdd6f4 !important;
+}
+
+.p-dropdown-panel {
+  background: #181825 !important;
+  border-color: #313244 !important;
+}
+
+.p-dropdown-item {
+  color: #cdd6f4 !important;
+  &:hover { background: #313244 !important; }
+  &.p-highlight { background: #313244 !important; color: #89b4fa !important; }
+}
+
+.p-inputtext {
+  background: #181825 !important;
+  border-color: #313244 !important;
+  color: #cdd6f4 !important;
+  &:focus { border-color: #89b4fa !important; box-shadow: 0 0 0 2px rgba(137,180,250,0.2) !important; }
+}
+
+.p-paginator {
+  background: #181825 !important;
+  border-top: 1px solid #313244 !important;
+  color: #a6adc8 !important;
+}
+
+.p-tag {
+  font-weight: 600;
+  border-radius: 4px;
+
+  &.p-tag-success { background: rgba(166,227,161,0.2); color: #a6e3a1; }
+  &.p-tag-info    { background: rgba(137,180,250,0.2); color: #89b4fa; }
+  &.p-tag-warning { background: rgba(249,226,175,0.2); color: #f9e2af; }
+  &.p-tag-danger  { background: rgba(243,139,168,0.2); color: #f38ba8; }
+}
+
+.p-tooltip .p-tooltip-text {
+  background: #313244 !important;
+  color: #cdd6f4 !important;
+  font-size: 0.78rem !important;
+}
+
+// Utility
+.text-right  { text-align: right !important; }
+.text-center { text-align: center !important; }
+.text-left   { text-align: left !important; }

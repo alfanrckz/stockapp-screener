@@ -1,0 +1,177 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #11111b;
+}
+
+// ── Navbar ──────────────────────────────────────────────────────────────────
+.app-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0 1.5rem;
+  height: 52px;
+  background: #0d0d17;
+  border-bottom: 1px solid #1e1e2e;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  flex-shrink: 0;
+
+  .brand-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #89b4fa 0%, #cba6f7 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i { color: #11111b; font-size: 0.9rem; font-weight: 700; }
+  }
+
+  .brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+
+  .brand-name {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #cdd6f4;
+    letter-spacing: -0.01em;
+  }
+
+  .brand-sub {
+    font-size: 0.62rem;
+    color: #585b70;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #585b70;
+  transition: all 0.15s;
+
+  i { font-size: 0.8rem; }
+
+  &:hover {
+    background: #1e1e2e;
+    color: #a6adc8;
+  }
+
+  &.active {
+    background: rgba(137,180,250,0.12);
+    color: #89b4fa;
+  }
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.nav-time {
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: #45475a;
+}
+
+.market-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+
+  &.open {
+    background: rgba(166,227,161,0.15);
+    color: #a6e3a1;
+    border: 1px solid rgba(166,227,161,0.3);
+  }
+  &.pre {
+    background: rgba(249,226,175,0.15);
+    color: #f9e2af;
+    border: 1px solid rgba(249,226,175,0.3);
+  }
+  &.break {
+    background: rgba(250,179,135,0.15);
+    color: #fab387;
+    border: 1px solid rgba(250,179,135,0.3);
+  }
+  &.post {
+    background: rgba(137,180,250,0.15);
+    color: #89b4fa;
+    border: 1px solid rgba(137,180,250,0.3);
+  }
+  &.screening {
+    background: rgba(203,166,247,0.15);
+    color: #cba6f7;
+    border: 1px solid rgba(203,166,247,0.3);
+  }
+  &.closed {
+    background: rgba(88,91,112,0.2);
+    color: #585b70;
+    border: 1px solid rgba(88,91,112,0.3);
+  }
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #a6e3a1;
+  box-shadow: 0 0 0 0 rgba(166,227,161,0.6);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(166,227,161,0.6); }
+  70%  { box-shadow: 0 0 0 5px rgba(166,227,161,0); }
+  100% { box-shadow: 0 0 0 0 rgba(166,227,161,0); }
+}
+
+// ── Main ─────────────────────────────────────────────────────────────────────
+.app-main {
+  flex: 1;
+  overflow: auto;
+}
+
+@media (max-width: 600px) {
+  .nav-time  { display: none; }
+  .brand-sub { display: none; }
+  .nav-link span { display: none; }
+}

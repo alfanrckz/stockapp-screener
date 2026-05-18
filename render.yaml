@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: idx-screener-backend
+    env: node
+    region: singapore
+    plan: free
+    rootDir: apps/backend
+    buildCommand: npm install && npm run build
+    startCommand: node dist/src/main
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: USE_MOCK_DATA
+        value: false
