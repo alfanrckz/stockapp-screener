@@ -9,11 +9,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { logger: ['log', 'error', 'warn', 'debug'] });
 
   // CORS — izinkan frontend dev & production
+  // CORS_ORIGIN bisa berisi satu URL atau beberapa dipisah koma
+  const extraOrigins = (process.env.CORS_ORIGIN ?? '')
+    .split(',')
+    .map(o => o.trim().replace(/\/$/, '')) // hapus trailing slash
+    .filter(Boolean);
+
   app.enableCors({
-    origin: [
-      'http://localhost:4200',
-      process.env.CORS_ORIGIN ?? '',
-    ].filter(Boolean),
+    origin: ['http://localhost:4200', ...extraOrigins],
     credentials: true,
   });
 
