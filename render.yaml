@@ -18,3 +18,7 @@ services:
         sync: false
       - key: USE_MOCK_DATA
         value: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: EOD_CRON_SCHEDULE
+        value: 15 9 * * 1-5
