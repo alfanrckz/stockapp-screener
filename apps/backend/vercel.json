@@ -2,6 +2,12 @@
   "version": 2,
   "installCommand": "npm install --include=dev",
   "buildCommand": "npm run build",
+  "crons": [
+    {
+      "path": "/api/cron/eod",
+      "schedule": "15 9 * * 1-5"
+    }
+  ],
   "routes": [
     { "src": "/(.*)", "dest": "/api/index" }
   ]
