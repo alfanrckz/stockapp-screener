@@ -1,13 +1,17 @@
 import { Controller, Get, Param, Query, Post, Logger, HttpCode } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { ScreeningService } from './screening.service';
+import { EodProcessorService } from '../cron/eod-processor.service';
 
 @ApiTags('Screening')
 @Controller('api/screening')
 export class ScreeningController {
   private readonly logger = new Logger(ScreeningController.name);
 
-  constructor(private readonly service: ScreeningService) {}
+  constructor(
+    private readonly service: ScreeningService,
+    private readonly eod: EodProcessorService,
+  ) {}
 
   @Get('results')
   @ApiOperation({ summary: 'Ambil hasil screening terbaru' })
@@ -40,12 +44,13 @@ export class ScreeningController {
 
   @Post('run')
   @HttpCode(202)
-  @ApiOperation({ summary: 'Trigger manual screening' })
+  @ApiOperation({ summary: 'Trigger manual screening (fetch OHLCV + screen)' })
   @ApiQuery({ name: 'date', required: false })
-  async triggerManual(@Query('date') date?: string) {
-    this.service.runFullScreening(date).catch(err =>
-      this.logger.error(`Manual screening error: ${err.message}`),
+  async triggerManual(@Query('date') _date?: string) {
+    // Selalu fetch OHLCV terbaru dulu sebelum screening
+    this.eod.runEOD().catch(err =>
+      this.logger.error(`Manual EOD error: ${err.message}`),
     );
-    return { success: true, message: 'Screening berjalan di background' };
+    return { success: true, message: 'Fetch OHLCV + screening berjalan di background' };
   }
 }
