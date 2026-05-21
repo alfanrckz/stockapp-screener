@@ -42,6 +42,13 @@ export class ScreeningController {
     return { success: true, data };
   }
 
+  @Get('streaks')
+  @ApiOperation({ summary: 'Jumlah hari berturut-turut tiap saham lolos screening' })
+  async getStreaks() {
+    const data = await this.service.getStreaks();
+    return { success: true, data };
+  }
+
   @Post('run')
   @HttpCode(202)
   @ApiOperation({ summary: 'Trigger manual screening (fetch OHLCV + screen)' })

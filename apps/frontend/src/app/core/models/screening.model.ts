@@ -17,6 +17,8 @@ export interface ScreeningResult {
   screening_date: string;
   stock_code: string;
   stock_name?: string;
+  sector?: string | null;
+  subsector?: string | null;
   close_price: number;
   prev_close: number;
   change_pct: number;
@@ -47,6 +49,7 @@ export interface ScreeningResult {
   take_profit_price: number;
   risk_reward_ratio: number;
   signal_strength: number;
+  streak?: number;
 }
 
 export const BANDARMOLOGY_SEVERITY: Record<BandarmologyStatus, number> = {

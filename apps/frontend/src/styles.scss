@@ -35,22 +35,22 @@ html, body {
 ::-webkit-scrollbar-thumb  { background: #45475a; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #585b70; }
 
-// PrimeNG Component overrides
-.p-dropdown {
+// PrimeNG 18 Component overrides (.p-select-* class names)
+.p-select {
   background: #181825 !important;
   border-color: #313244 !important;
   color: #cdd6f4 !important;
 }
 
-.p-dropdown-panel {
+.p-select-overlay {
   background: #181825 !important;
   border-color: #313244 !important;
 }
 
-.p-dropdown-item {
+.p-select-option {
   color: #cdd6f4 !important;
   &:hover { background: #313244 !important; }
-  &.p-highlight { background: #313244 !important; color: #89b4fa !important; }
+  &.p-select-option-selected { background: #313244 !important; color: #89b4fa !important; }
 }
 
 .p-inputtext {

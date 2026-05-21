@@ -16,7 +16,7 @@
       [ngModel]="selectedDate()"
       (ngModelChange)="onDateChange($event)"
       placeholder="Pilih Tanggal"
-      [style]="{ minWidth: '158px', height: '22px' }"
+      styleClass="hdr-dropdown date-dropdown"
     />
 
     <p-dropdown
@@ -24,18 +24,57 @@
       [ngModel]="selectedBandoFilter()"
       (ngModelChange)="selectedBandoFilter.set($event)"
       placeholder="Filter"
-      [style]="{ minWidth: '190px', height: '22px' }"
+      styleClass="hdr-dropdown filter-dropdown"
     />
+
+    <p-dropdown
+      [options]="sectorOptions()"
+      [ngModel]="selectedSector()"
+      (ngModelChange)="selectedSector.set($event)"
+      placeholder="Semua Sektor"
+      styleClass="hdr-dropdown sector-dropdown"
+      pTooltip="Filter berdasarkan sektor industri"
+      tooltipPosition="bottom"
+    />
+
+    @if (!hasSectorData() && results().length > 0) {
+      <p-button
+        icon="pi pi-building"
+        label="Sync Sektor"
+        [text]="true"
+        size="small"
+        severity="secondary"
+        (onClick)="onSyncSectors()"
+        [loading]="syncingSectors()"
+        pTooltip="Ambil data sektor dari Yahoo Finance (sekali saja)"
+        tooltipPosition="bottom"
+        styleClass="sync-sector-btn"
+      />
+    }
 
     <span class="search-wrap">
       <i class="pi pi-search search-icon"></i>
       <input
         pInputText
-        [(ngModel)]="globalFilter"
+        [ngModel]="globalFilter()"
+        (ngModelChange)="globalFilter.set($event)"
         placeholder="Cari kode / nama…"
         class="search-input"
       />
     </span>
+
+    <p-button
+      icon="pi pi-download"
+      label="Excel"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="onExportExcel()"
+      [loading]="exporting()"
+      [disabled]="filteredResults().length === 0"
+      pTooltip="Export hasil screening ke Excel (.xlsx) dengan warna"
+      tooltipPosition="bottom"
+      styleClass="export-btn"
+    />
 
     <p-button
       icon="pi pi-refresh"
@@ -113,11 +152,10 @@
   <p-table
     [value]="filteredResults()"
     [paginator]="true"
-    [rows]="25"
-    [rowsPerPageOptions]="[10, 25, 50]"
+    [rows]="15"
+    [rowsPerPageOptions]="[15, 25, 50]"
     [sortField]="'signal_strength'"
     [sortOrder]="-1"
-    [globalFilterFields]="['stock_code','stock_name','bandarmology_status','technical_position']"
     dataKey="stock_code"
     styleClass="p-datatable-sm screener-table"
     [scrollable]="true"
@@ -132,6 +170,11 @@
             <i class="pi pi-times"></i> {{ selectedBandoFilter() }}
           </span>
         }
+        @if (selectedSector()) {
+          <span class="filter-active sector-badge" (click)="selectedSector.set(null)">
+            <i class="pi pi-times"></i> {{ selectedSector() }}
+          </span>
+        }
       </div>
     </ng-template>
 
@@ -139,6 +182,10 @@
       <tr>
         <th pSortableColumn="stock_code" style="min-width:120px">
           Emiten <p-sortIcon field="stock_code" />
+        </th>
+        <th pSortableColumn="streak" class="text-center" style="min-width:78px"
+          pTooltip="Jumlah hari berturut-turut saham ini lolos screening. Makin panjang makin terkonfirmasi." tooltipPosition="top">
+          Streak <p-sortIcon field="streak" />
         </th>
         <th pSortableColumn="bandarmology_status" style="min-width:200px"
           pTooltip="Status akumulasi berdasarkan CMF + OBV" tooltipPosition="top">
@@ -194,6 +241,26 @@
           <div class="emiten-cell">
             <span class="ticker">{{ row.stock_code }}</span>
             <span class="company">{{ row.stock_name }}</span>
+          </div>
+        </td>
+
+        <!-- Streak -->
+        <td class="text-center">
+          <div class="streak-cell">
+            <span class="streak-days" [style.color]="getStreakColor(row.streak ?? 1)">
+              {{ row.streak ?? 1 }}
+            </span>
+            <span class="streak-bar-wrap">
+              @for (i of [1,2,3,4,5]; track i) {
+                <span class="streak-dot"
+                  [class.active]="(row.streak ?? 1) >= i"
+                  [style.background]="(row.streak ?? 1) >= i ? getStreakColor(row.streak ?? 1) : null">
+                </span>
+              }
+            </span>
+            <span class="streak-lbl" [style.color]="getStreakColor(row.streak ?? 1)">
+              {{ getStreakLabel(row.streak ?? 1) }}
+            </span>
           </div>
         </td>
 
@@ -325,7 +392,7 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="13">
+        <td colspan="14">
           <div class="empty-state">
             <i class="pi pi-chart-line"></i>
             <p>Belum ada data screening</p>

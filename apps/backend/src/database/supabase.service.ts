@@ -101,18 +101,27 @@ export class SupabaseService implements OnModuleInit {
     if (error) throw new Error(`upsertStocks error: ${error.message}`);
   }
 
+  async updateStockSectors(updates: Array<{ code: string; sector: string; subsector?: string }>) {
+    for (const u of updates) {
+      const { error } = await this.client
+        .from('stocks')
+        .update({ sector: u.sector, subsector: u.subsector ?? null })
+        .eq('code', u.code);
+      if (error) this.logger.warn(`updateStockSectors error ${u.code}: ${error.message}`);
+    }
+  }
+
   // ── Screening Results ─────────────────────────────────────────────────────
 
   async getLatestScreeningResults(date?: string) {
     let query = this.client
       .from('screening_results')
-      .select('*')
+      .select('*, stocks!stock_code(sector, subsector)')
       .order('signal_strength', { ascending: false });
 
     if (date) {
       query = query.eq('screening_date', date);
     } else {
-      // Ambil tanggal terbaru
       const { data: latest } = await this.client
         .from('screening_results')
         .select('screening_date')
@@ -127,7 +136,15 @@ export class SupabaseService implements OnModuleInit {
 
     const { data, error } = await query;
     if (error) throw new Error(`getLatestScreeningResults error: ${error.message}`);
-    return data ?? [];
+
+    return (data ?? []).map((row: any) => {
+      const { stocks: stockInfo, ...rest } = row;
+      return {
+        ...rest,
+        sector:    stockInfo?.sector    ?? null,
+        subsector: stockInfo?.subsector ?? null,
+      };
+    });
   }
 
   async upsertScreeningResults(rows: object[]) {
@@ -150,6 +167,50 @@ export class SupabaseService implements OnModuleInit {
 
     if (error) throw new Error(`getChartData error: ${error.message}`);
     return (data ?? []).reverse();
+  }
+
+  async getStockStreaks(): Promise<Record<string, number>> {
+    // Fetch last 10 distinct screening dates
+    const { data: dateRows, error: dateErr } = await this.client
+      .from('screening_results')
+      .select('screening_date')
+      .order('screening_date', { ascending: false })
+      .limit(200); // over-fetch; we'll deduplicate
+
+    if (dateErr) throw new Error(`getStockStreaks dates error: ${dateErr.message}`);
+
+    const dates = [...new Set((dateRows ?? []).map(d => d.screening_date))].slice(0, 10);
+    if (dates.length === 0) return {};
+
+    // Fetch stock_code + date for those dates in one query
+    const { data: rows, error: rowErr } = await this.client
+      .from('screening_results')
+      .select('stock_code, screening_date')
+      .in('screening_date', dates);
+
+    if (rowErr) throw new Error(`getStockStreaks rows error: ${rowErr.message}`);
+
+    // Build set-per-date map
+    const byDate = new Map<string, Set<string>>();
+    for (const row of rows ?? []) {
+      if (!byDate.has(row.screening_date)) byDate.set(row.screening_date, new Set());
+      byDate.get(row.screening_date)!.add(row.stock_code);
+    }
+
+    // Compute consecutive streak for each stock in the latest date
+    const latest   = byDate.get(dates[0]) ?? new Set<string>();
+    const streaks: Record<string, number> = {};
+
+    for (const code of latest) {
+      let count = 0;
+      for (const date of dates) {
+        if (byDate.get(date)?.has(code)) count++;
+        else break;
+      }
+      streaks[code] = count;
+    }
+
+    return streaks;
   }
 
   async getAvailableScreeningDates(limit = 10) {

@@ -168,4 +168,8 @@ export class ScreeningService {
   async getAvailableDates() {
     return this.supabase.getAvailableScreeningDates();
   }
+
+  async getStreaks(): Promise<Record<string, number>> {
+    return this.supabase.getStockStreaks();
+  }
 }

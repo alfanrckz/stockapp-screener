@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { StocksService } from './stocks.service';
 
@@ -12,6 +12,13 @@ export class StocksController {
   async getAll() {
     const data = await this.service.getAllStocks();
     return { success: true, count: data.length, data };
+  }
+
+  @Post('sync-sectors')
+  @ApiOperation({ summary: 'Sinkronisasi data sektor dari Yahoo Finance (jalankan sekali)' })
+  async syncSectors() {
+    const result = await this.service.syncSectors();
+    return { success: true, ...result };
   }
 
   @Get(':code/prices')

@@ -40,6 +40,18 @@ export class ScreeningService {
       .post<ApiResponse<{ message: string }>>('/api/screening/run')
       .pipe(map(r => r.data));
   }
+
+  syncSectors(): Observable<{ updated: number; failed: number }> {
+    return this.api
+      .post<{ success: boolean; updated: number; failed: number }>('/api/stocks/sync-sectors')
+      .pipe(map(r => ({ updated: r.updated, failed: r.failed })));
+  }
+
+  getStreaks(): Observable<Record<string, number>> {
+    return this.api
+      .get<{ success: boolean; data: Record<string, number> }>('/api/screening/streaks')
+      .pipe(map(r => r.data));
+  }
 }
 
 export interface CandlestickData {

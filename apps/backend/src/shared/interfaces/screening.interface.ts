@@ -57,6 +57,8 @@ export interface ScreeningResult {
   screening_date: string;
   stock_code: string;
   stock_name?: string;
+  sector?: string | null;
+  subsector?: string | null;
   close_price: number;
   prev_close: number;
   change_pct: number;
